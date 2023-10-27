@@ -10,10 +10,34 @@ body
     overflow: hidden;
 }
 
+.canvas-container {
+    position: relative;
+}
+
 .webgl
 {
     position: fixed;
     top: 0;
     left: 0;
     outline: none;
+    z-index: 1;
 }
+
+#btn
+{
+    position: absolute;
+    top: 1vw;
+    left: 1vw;
+    z-index: 2;
+    color: grey;
+    font-size: 2vh;
+    border: none;
+    background: transparent;
+}
+
+#btn:hover {
+    cursor: pointer;
+}
+
+
+
