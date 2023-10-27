@@ -5,12 +5,8 @@ import * as dat from 'lil-gui'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { GLTFLoader, GLTFParser } from 'three/examples/jsm/loaders/GLTFLoader'
 
-// const audio = new Audio('path-to-your-audio-file.mp3');
-
-
-
 /**
- * Loaders
+ * LOADERS
  */
 const gltfLoader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
@@ -20,9 +16,8 @@ const textureLoader = new THREE.TextureLoader();
 const audioLoader = new THREE.AudioLoader();
 const listener = new THREE.AudioListener();
 
-
 /**
- * Audio
+ * AUDIO
  */
 
 const audio = new THREE.PositionalAudio(listener);
@@ -61,7 +56,7 @@ btn.addEventListener('click', () => {
 });
 
 /**
- * Base
+ * BASE
  */
 
 // Debug
@@ -73,48 +68,35 @@ const canvas = document.querySelector('canvas.webgl');
 // Scene
 const scene = new THREE.Scene();
 
+// // Create an AxesHelper
+// const axesHelper = new THREE.AxesHelper(5); // Adjust the size as needed
+
+// // Add the axesHelper to your scene
+// scene.add(axesHelper);
 
 /**
- * Materials
- */
-
-// const colorTexture = textureLoader.load('/textures/p-color.png');
-// const normalTexture = textureLoader.load('/textures/p-normal.png');
-// const roughnessTexture = textureLoader.load('/textures/p-roughness.png');
-
-/**
- * Materials
- */
-
-
-// const material = new THREE.MeshStandardMaterial({
-//     map: colorTexture,
-//     normalMap: normalTexture, // Apply the normal texture
-//     roughnessMap: roughnessTexture, // Apply the roughness texture
-//     roughness: 0.5, // Adjust the roughness value as needed
-// });
-
-/**
- * Models
+ * MODELS
  */
 
 gltfLoader.load(
     '/models/pumpkin.gltf', (gltf) => {
 
         scene.add(gltf.scene);
+        // gltf.scene.rotation.y = - (Math.PI * 0.5);
         gltf.scene.children[0].visible = false; // Hide the mesh at index 1
         gltf.scene.children[1].visible = false; // Hide the mesh at index 1
         gltf.scene.children[2].visible = false; // Hide the mesh at index 2
         gltf.scene.children[3].visible = false; // Hide the mesh at index 3
+        // gltf.scene.scale(0.5, 0.5, 0.5);
 
         const pumpkin = gltf.scene.children[4];
-        const pumpkinMaterial = gltf.scene.children[4].material;
-
-        console.log(pumpkinMaterial)
-
-        pumpkin.position.set(1.5, 0, 0.2);
-
-        // console.log(gltf.scene)
+        pumpkin.receiveShadow = true;
+        pumpkin.castShadow = true;
+        pumpkin.position.set(0, - 0.3, 0.15);
+        // pumpkin.rotation.y = - (Math.PI * 0.5);
+        // pumpkin.rotation.z = - 0.2
+        console.log(pumpkin.position)
+        console.log(gltf.scene)
 
         }
     )
@@ -123,19 +105,48 @@ gltfLoader.load(
 /**
  * Lights
  */
-// const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+// const ambientLight = new THREE.AmbientLight(0xffca7b, 0.3);
 // scene.add(ambientLight);
-const spotLight = new THREE.SpotLight(0xffffff, 5); // Couleur blanche (0xffffff)
+const spotLight = new THREE.SpotLight(0xffffff, 4); // Couleur blanche (0xffffff)
 spotLight.position.set(6, -0.15, 0.5); // Position de la lumière
 spotLight.distance = 15; // Distance d'éclairage
 spotLight.angle = Math.PI / 4; // Angle du cône de lumière (en radians)
 spotLight.penumbra = 0.2; // Penumbra (zone de transition douce du cône)
 spotLight.decay = 3; // Atténuation de la lumière
+spotLight.normalBias = 0.05;
 scene.add(spotLight)
 
-gui.add(spotLight.position, 'x').name('spotLight Z').min(- 1).max(15).step(0.01);
-gui.add(spotLight.position, 'y').name('spotLight Y').min(- 5).max(10).step(0.01);
-gui.add(spotLight.position, 'z').name('spotLight X').min(- 5).max(10).step(0.01);
+const fireLight = new THREE.PointLight(0xe47025, 2, 100);
+fireLight.position.set(0, 0.34, 0.15);
+scene.add(fireLight);
+
+// Set the initial light intensity for your fireLight
+let baseIntensity = 1;
+
+// Function to update the fireLight intensity with flickering effect
+function updateLightIntensity() {
+  // Add random fluctuations to the intensity
+  const randomFactor = 0.2; // Adjust this value for the desired flicker intensity
+  const randomIntensity = baseIntensity + (Math.random() * randomFactor - randomFactor / 2);
+  fireLight.intensity = randomIntensity;
+
+  // Schedule the next intensity update
+  const flickerDelay = Math.random() * 500; // Adjust this value for the desired flicker frequency
+  setTimeout(updateLightIntensity, flickerDelay);
+}
+
+// Start the flickering effect for your fireLight
+updateLightIntensity();
+
+
+// gui.add(spotLight.position, 'x').name('spotLight Z').min(- 1).max(15).step(0.01);
+// gui.add(spotLight.position, 'y').name('spotLight Y').min(- 5).max(10).step(0.01);
+// gui.add(spotLight.position, 'z').name('spotLight X').min(- 5).max(10).step(0.01);
+
+// gui.add(fireLight.position, 'x').name('FLight Z').min(- 3).max(4).step(0.001);
+// gui.add(fireLight.position, 'y').name('FLight Y').min(- 5).max(4).step(0.001);
+// gui.add(fireLight.position, 'z').name('FLight X').min(- 5).max(4).step(0.001);
+
 
 
 
@@ -168,13 +179,13 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(2.8, 0.7, 0)
+camera.position.set(1.6, 0.4, 0)
 scene.add(camera)
 camera.add(listener);
 
-gui.add(camera.position, 'x').name('camera Z').min(- 0.5).max(4).step(0.001);
-gui.add(camera.position, 'y').name('camera Y').min(- 0.5).max(2).step(0.001);
-gui.add(camera.position, 'z').name('camera X').min(- 2).max(2).step(0.001);
+// gui.add(camera.position, 'x').name('camera X').min(- 0.5).max(4).step(0.001);
+// gui.add(camera.position, 'y').name('camera Y').min(- 0.5).max(2).step(0.001);
+// gui.add(camera.position, 'z').name('camera Z').min(- 2).max(10).step(0.001);
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
@@ -205,3 +216,14 @@ const tick = () =>
 }
 
 tick()
+
+
+x
+: 
+1.9649567298442032
+y
+: 
+0.372753029110417
+z
+: 
+0.0004786741940472902
