@@ -103,7 +103,65 @@ gltfLoader.load(
 
 
 /**
- * Lights
+ * PARTICLES
+ */
+
+const particleTexture = textureLoader.load('/textures/scorch_01.png');
+
+const particleMaterial = new THREE.PointsMaterial({
+    color: 0xb2beb5,
+    size: 0.03, // Adjust the size as needed
+    alphaMap: particleTexture, // You can use a texture for a more realistic appearance
+    blending: THREE.AdditiveBlending, // Additive blending works well for particles
+    transparent: true,
+    depthWrite: false,
+    sizeAttenuation: true
+});
+
+const particleGeometry = new THREE.BufferGeometry();
+const particlePositions = [];
+
+for (let i = 0; i < 200; i++) {
+    const x =  (Math.random() - 0.5) * 5
+    const y =  (Math.random() - 0.5) * 5
+    const z = (Math.random() - 0.5) * 5
+
+    particlePositions.push(x,y,z)
+};
+
+particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(particlePositions, 3));
+
+const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+
+scene.add(particleSystem);
+
+const clock = new THREE.Clock();
+
+function animateParticles() {
+    const elapsedTime = clock.getElapsedTime();
+    const positions = particleGeometry.attributes.position.array;
+
+    for (let i = 0; i < positions.length; i += 3) {
+        // Apply a gradual and controlled movement
+        positions[i] += (Math.random() - 0.5) * 0.001;
+        positions[i + 1] += Math.random() * 0.001; // Allow particles to rise steadily
+        positions[i + 2] += (Math.random() - 0.5) * 0.001;
+
+        if (positions[i + 1] > 1) {
+            // Reset the particle's position when it's too high
+            positions[i] = (Math.random() - 0.5) * 5;
+            positions[i + 1] = -5 + Math.random(); // Randomize the starting Y position
+            positions[i + 2] = (Math.random() - 0.5) * 5;
+        }
+    }
+
+    particleGeometry.attributes.position.needsUpdate = true;
+}
+
+
+
+/**
+ * LIGHTS
  */
 // const ambientLight = new THREE.AmbientLight(0xffca7b, 0.3);
 // scene.add(ambientLight);
@@ -133,7 +191,7 @@ function updateLightIntensity() {
   // Schedule the next intensity update
   const flickerDelay = Math.random() * 500; // Adjust this value for the desired flicker frequency
   setTimeout(updateLightIntensity, flickerDelay);
-}
+};
 
 // Start the flickering effect for your fireLight
 updateLightIntensity();
@@ -151,7 +209,7 @@ updateLightIntensity();
 
 
 /**
- * Sizes
+ * SIZES
  */
 const sizes = {
     width: window.innerWidth,
@@ -175,7 +233,7 @@ window.addEventListener('resize', () =>
 })
 
 /**
- * Camera
+ * CAMERA
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
@@ -192,7 +250,7 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
 /**
- * Renderer
+ * RENDERER
  */
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
@@ -201,10 +259,14 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
- * Animate
+ * ANIMATE
  */
 const tick = () =>
 {
+
+    //Update particles
+    animateParticles();
+
     // Update controls
     controls.update()
 
@@ -216,14 +278,3 @@ const tick = () =>
 }
 
 tick()
-
-
-x
-: 
-1.9649567298442032
-y
-: 
-0.372753029110417
-z
-: 
-0.0004786741940472902
