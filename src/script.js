@@ -106,10 +106,10 @@ gltfLoader.load(
  * PARTICLES
  */
 
-const particleTexture = textureLoader.load('/textures/scorch_01.png');
+const particleTexture = textureLoader.load('/textures/trace_06.png');
 
 const particleMaterial = new THREE.PointsMaterial({
-    color: 0xb2beb5,
+    color: 0xaa4203,
     size: 0.03, // Adjust the size as needed
     alphaMap: particleTexture, // You can use a texture for a more realistic appearance
     blending: THREE.AdditiveBlending, // Additive blending works well for particles
@@ -122,12 +122,12 @@ const particleGeometry = new THREE.BufferGeometry();
 const particlePositions = [];
 
 for (let i = 0; i < 200; i++) {
-    const x =  (Math.random() - 0.5) * 5
-    const y =  (Math.random() - 0.5) * 5
-    const z = (Math.random() - 0.5) * 5
+    const x = (Math.random() - 0.5) * 5;
+    const y = (Math.random() - 0.5) * 5;
+    const z = (Math.random() - 0.5) * 5;
 
-    particlePositions.push(x,y,z)
-};
+    particlePositions.push(x, y, z);
+}
 
 particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(particlePositions, 3));
 
@@ -147,16 +147,26 @@ function animateParticles() {
         positions[i + 1] += Math.random() * 0.001; // Allow particles to rise steadily
         positions[i + 2] += (Math.random() - 0.5) * 0.001;
 
-        if (positions[i + 1] > 1) {
-            // Reset the particle's position when it's too high
-            positions[i] = (Math.random() - 0.5) * 5;
-            positions[i + 1] = -5 + Math.random(); // Randomize the starting Y position
-            positions[i + 2] = (Math.random() - 0.5) * 5;
+        // add random tilt
+        const tiltAmount = 0.005;
+        positions[i] += (Math.random() - 0.5) * tiltAmount;
+        positions[i + 2] += (Math.random() - 0.5) * tiltAmount;
+
+        if (positions[1] > 1) {
+            // Reset the particle's position, rotation, and axis when it's too high
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 5;
+                positions[i + 1] = -5 + Math.random();
+                positions[i + 2] = (Math.random() - 0.5) * 5;
+            }
         }
-    }
 
     particleGeometry.attributes.position.needsUpdate = true;
+    }
+
 }
+
+
 
 
 
