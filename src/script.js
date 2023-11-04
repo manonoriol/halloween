@@ -101,7 +101,6 @@ gltfLoader.load(
         }
     )
 
-
 /**
  * PARTICLES
  */
@@ -110,7 +109,7 @@ const particleTexture = textureLoader.load('/textures/trace_06.png');
 
 const particleMaterial = new THREE.PointsMaterial({
     color: 0xaa4203,
-    size: 0.03, // Adjust the size as needed
+    size: 0.05, // Adjust the size as needed
     alphaMap: particleTexture, // You can use a texture for a more realistic appearance
     blending: THREE.AdditiveBlending, // Additive blending works well for particles
     transparent: true,
@@ -119,56 +118,20 @@ const particleMaterial = new THREE.PointsMaterial({
 });
 
 const particleGeometry = new THREE.BufferGeometry();
-const particlePositions = [];
+const count = 2000;
+const positions = new Float32Array(count * 3);
 
-for (let i = 0; i < 200; i++) {
-    const x = (Math.random() - 0.5) * 5;
-    const y = (Math.random() - 0.5) * 5;
-    const z = (Math.random() - 0.5) * 5;
-
-    particlePositions.push(x, y, z);
+for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 10;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
 }
 
-particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(particlePositions, 3));
+particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+const particles = new THREE.Points(particleGeometry, particleMaterial);
 
-scene.add(particleSystem);
-
-const clock = new THREE.Clock();
-
-function animateParticles() {
-    const elapsedTime = clock.getElapsedTime();
-    const positions = particleGeometry.attributes.position.array;
-
-    for (let i = 0; i < positions.length; i += 3) {
-        // Apply a gradual and controlled movement
-        positions[i] += (Math.random() - 0.5) * 0.001;
-        positions[i + 1] += Math.random() * 0.001; // Allow particles to rise steadily
-        positions[i + 2] += (Math.random() - 0.5) * 0.001;
-
-        // add random tilt
-        const tiltAmount = 0.005;
-        positions[i] += (Math.random() - 0.5) * tiltAmount;
-        positions[i + 2] += (Math.random() - 0.5) * tiltAmount;
-
-        if (positions[1] > 1) {
-            // Reset the particle's position, rotation, and axis when it's too high
-            for (let i = 0; i < positions.length; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 5;
-                positions[i + 1] = -5 + Math.random();
-                positions[i + 2] = (Math.random() - 0.5) * 5;
-            }
-        }
-
-    particleGeometry.attributes.position.needsUpdate = true;
-    }
-
-}
-
-
-
-
+scene.add(particles);
 
 /**
  * LIGHTS
@@ -214,8 +177,6 @@ updateLightIntensity();
 // gui.add(fireLight.position, 'x').name('FLight Z').min(- 3).max(4).step(0.001);
 // gui.add(fireLight.position, 'y').name('FLight Y').min(- 5).max(4).step(0.001);
 // gui.add(fireLight.position, 'z').name('FLight X').min(- 5).max(4).step(0.001);
-
-
 
 
 /**
@@ -271,20 +232,18 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 /**
  * ANIMATE
  */
-const tick = () =>
-{
 
-    //Update particles
-    animateParticles();
+const clock = new THREE.Clock()
 
-    // Update controls
-    controls.update()
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime();
 
-    // Render
-    renderer.render(scene, camera)
-
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+    // Update particles position
+    particles.position.y = elapsedTime * 0.03;
+    
+    controls.update();
+    renderer.render(scene, camera);
+    window.requestAnimationFrame(tick);
 }
 
-tick()
+tick();
