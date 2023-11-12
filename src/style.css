@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'wtf-ghosrain';
+    src: url('/static/fonts/WTF-Ghosrain.ttf') format('truetype');
+}
+
+
 *
 {
     margin: 0;
@@ -25,12 +31,13 @@ body
 
 #btn
 {
+    font-family: 'wtf-ghosrain', sans-serif;
     position: absolute;
-    top: 1vw;
-    left: 1vw;
+    font-size: 7vmax;
+    top: 4vh;
+    left: 3vw;
     z-index: 2;
-    color: grey;
-    font-size: 2vh;
+    color: #bc3908;
     border: none;
     background: transparent;
 }
