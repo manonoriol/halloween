@@ -109,7 +109,7 @@ const particleTexture = textureLoader.load('/textures/trace_06.png');
 
 const particleMaterial = new THREE.PointsMaterial({
     color: 0xaa4203,
-    size: 0.05, // Adjust the size as needed
+    size: 0.03, // Adjust the size as needed
     alphaMap: particleTexture, // You can use a texture for a more realistic appearance
     blending: THREE.AdditiveBlending, // Additive blending works well for particles
     transparent: true,
@@ -136,8 +136,8 @@ scene.add(particles);
 /**
  * LIGHTS
  */
-// const ambientLight = new THREE.AmbientLight(0xffca7b, 0.3);
-// scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight(0xffca7b, 0.1);
+scene.add(ambientLight);
 const spotLight = new THREE.SpotLight(0xffffff, 4); // Couleur blanche (0xffffff)
 spotLight.position.set(6, -0.15, 0.5); // Position de la lumière
 spotLight.distance = 15; // Distance d'éclairage
@@ -220,6 +220,12 @@ camera.add(listener);
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
+// Limits for zooming
+const minZoom = 0.7; // Adjust this value based on your scene
+const maxZoom = 2;   // Adjust this value based on your scene
+controls.minDistance = minZoom;
+controls.maxDistance = maxZoom;
+
 /**
  * RENDERER
  */
@@ -237,10 +243,11 @@ const clock = new THREE.Clock()
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime();
-
-    // Update particles position
-    particles.position.y = elapsedTime * 0.03;
     
+    // Update particles position
+    const loopHeight = 5; 
+    particles.position.y = (elapsedTime * 0.03) % loopHeight;
+        
     controls.update();
     renderer.render(scene, camera);
     window.requestAnimationFrame(tick);
