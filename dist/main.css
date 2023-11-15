@@ -1,0 +1,53 @@
+@font-face {
+    font-family: 'wtf-ghosrain';
+    src: url(assets/fonts/ef8f1fc3d26b117b.ttf) format('truetype');
+}
+
+
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.canvas-container {
+    position: relative;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+    z-index: 1;
+}
+
+#btn
+{
+    font-family: 'wtf-ghosrain', sans-serif;
+    position: absolute;
+    font-size: 7vmax;
+    top: 4vh;
+    left: 3vw;
+    z-index: 2;
+    color: #bc3908;
+    border: none;
+    background: transparent;
+}
+
+#btn:hover {
+    cursor: pointer;
+}
+
+
+
+
+
+/*# sourceMappingURL=main.css.map*/
